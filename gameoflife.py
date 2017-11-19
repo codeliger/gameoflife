@@ -1,49 +1,63 @@
-import operator, multiprocessing
+class Universe:
 
-cells = dict()
+    def __init__(self):
+        self.index = dict()
+        self.neighbours = [(x,y) for x in range(-1,2) for y in range(-1,2) if not (x == 0 and y == 0)]
 
-class Cell:
+    def __iter__(self):
+        self.index.__iter__()
 
-    def __init__(self, x, y, cells,alive=False):
-        self.x = x
-        self.y = y
-        self.cells = cells
-        self.is_alive = alive
+    def get_cell_at(self, position:tuple):
+        return self.index[position]
 
-    def location(self):
-        return tuple([self.x,self.y])
+    def has_cell_at(self,position:tuple):
+        return position in self.index
 
-    NEIGHBOURHOOD = {
-        'N':(0,1),
-        'NE':(1,1),
-        'NW':(-1,1),
-        'E':(1,0),
-        'S':(0,-1),
-        'SE':(1,-1),
-        'SW':(-1,-1),
-        'W':(-1,0)
-    }
+    def revive_cell_at(self,position:tuple):
+        if position in self.index:
+            self.index[position] = True
+        else:
+            raise Exception("Could not revive a cell at {0} because it doesn't exist.".format(position))
 
-    def count_neighbours(self):
-        i = 0
-        for n in self.NEIGHBOURHOOD.values():
-            lookup = tuple([self.x+n[0],self.y+n[1]])
-            if lookup in self.cells:
-                if self.cells[lookup].is_alive:
-                    i+=1
-        return i
+    def kill_cell_at(self,position:tuple):
+        if position in self.index:
+            self.index[position] = False
+
+    def create_cell_at(self,position:tuple):
+        if self.has_cell_at(position):
+            print("Overwriting cell at {0}".format(position))
+        self.index[position] = True
+
+    def destroy_cell_at(self,position:tuple):
+        if position in self.index:
+            self.index.pop(position)
+        else:
+            raise Exception("Could not destroy a cell at {0} because it doesn't exist.".format(position))
+
+    def get_cell_neighbours(self,position:tuple)->list:
+        return [tuple([position[0]+neighbour[0],position[1]+neighbour[1]]) for neighbour in self.neighbours]
+
+    def get_cell_neighbour_states(self,cell_neighbours:list)->list:
+        return [self.return_cell_at(position) for position in cell_neighbours]
+
+    def count_alive_cell_neighbours(self,cell_neighbour_states:list)->int:
+        return cell_neighbour_states.count(True)
+
 
 if __name__ == '__main__':
+    u = Universe()
+    u.create_cell_at((0,1))
+    u.create_cell_at((0,2))
+    u.create_cell_at((0,3))
 
-    a = Cell(1,1,cells)
-    b = Cell(1,2,cells)
-    c = Cell(1,3,cells)
 
-    cells[a.location()] = a
-    cells[b.location()] = b
-    cells[c.location()] = c
 
-    print(a.count_neighbours())
+
+
+
+
+
+
 
 
 
