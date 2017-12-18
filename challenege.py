@@ -23,25 +23,21 @@ counters = dict()
 for i in range(1,301,1):
   counters[i] = 0
 
-terminate = False
-
 last_ts = 0
 minute_ts = 0
 count = 0
 
-while terminate == False:
+while True:
 
-    raw_ts = input('Timestamp:')
-    if raw_ts == '':
-      terminate = True
-      continue
+    raw_input = input("ts rpt:")
 
-    raw_rpt = input('Request Processing Time:')
+    if raw_input == '':
+      break
 
-    # stop when empty
-    if raw_rpt == '':
-      terminate = True
-      continue
+    split_input = raw_input.split(' ')
+
+    raw_ts = split_input[0] #timestamp
+    raw_rpt = split_input[0] #request processing time
     
     ts = float(raw_ts)
     rpt = float(raw_rpt)
@@ -71,7 +67,15 @@ while terminate == False:
 
 # terminated
 
-iso8601 = datetime.datetime.fromtimestamp(minute_ts).isoformat()
+if count == 0:
+  print('Exiting')
+  exit()
+
+try:
+  iso8601 = datetime.datetime.fromtimestamp(minute_ts).isoformat()
+except Exception as e:
+  print('minute_ts:',minute_ts,e)
+
 
 # create a list of only the values greater than 0 (possibly more effecient, maybe not)
 active_counters = [(x,counters[x]) for x in counters if counters[x] > 0 ]
@@ -85,11 +89,10 @@ bracket = 0
 for counter in active_counters:
   bracket += counter[1]
   if bracket >= percentile_index:
-    print(iso8601,(counter[0]*5)/10)
+    print(iso8601,(counter[0] * 5) / 10)
     exit()
     
     
-
 
 
 
