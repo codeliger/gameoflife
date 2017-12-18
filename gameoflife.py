@@ -1,3 +1,9 @@
+'''
+    Any live cell with fewer than two live neighbours dies, as if caused by underpopulation.
+    Any live cell with two or three live neighbours lives on to the next generation.
+    Any live cell with more than three live neighbours dies, as if by overpopulation.
+    Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+'''
 class Universe:
 
     def __init__(self):
@@ -40,18 +46,8 @@ class Universe:
         else:
             raise Exception("Could not kill cell at {0} because it doesn't exist.".format(position))
 
-
-
-
-
-if __name__ == '__main__':
-    universe = Universe()
-    universe_b = Universe()
-    universe.create_cell_at((0,1))
-    universe.create_cell_at((0,2))
-    universe.create_cell_at((0,3))
-
-    def getCellState(location:tuple):
+    '''Method doesnt work because it needs a blacklist of what cells it already checked. 1,0 checks 0,1 infinitely because it always scans the area around it'''
+    def getCellState(cell:tuple):
         neighbour_count = 0
         dead_cells_to_create = list()
         for neighbour in universe.neighbours:
@@ -64,26 +60,17 @@ if __name__ == '__main__':
                 dead_cells_to_create.append(neighbour)
         cell_state = neighbour_count > 1 and neighbour_count < 4
         if cell_state:
-            return map(getCellState,set(dead_cells_to_create))
-        return list(cell)
+            return list(map(getCellState,set(dead_cells_to_create))).append(cell)
+        return list(map(getCellState,set(dead_cells_to_create)))
 
+    print(list(map(getCellState,universe.index)))
 
-    #evaluate dead cells
-    for cell in universe:
-        if universe.index[cell] == False:
-            neighbour_count = 0
-            for neighbour in universe.neighbours:
-                neighbour = tuple([cell[0] + neighbour[0], cell[1] + neighbour[1]])
-                if universe.has_cell_at(neighbour):
-                    neighbour_state = universe.get_cell_at(neighbour)
-                    if neighbour_state == True:
-                        neighbour_count+=1
-                else:
-                    universe.create_cell_at(neighbour)
-                    universe.kill_cell_at(neighbour)
-            cell_state = neighbour_count > 1 and neighbour_count < 4
-            if cell_state:
-                universe_b.create_cell_at(cell)
+if __name__ == '__main__':
+    universe = Universe()
+    universe.create_cell_at((0,1))
+    universe.create_cell_at((0,2))
+    universe.create_cell_at((0,3))
+
 
 
 
